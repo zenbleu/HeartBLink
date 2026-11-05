@@ -4,23 +4,13 @@ import {
   Sparkles, 
   Heart, 
   ArrowLeft, 
-  MoreVertical, 
-  Flame, 
   CheckCheck, 
-  Volume2, 
-  VolumeX, 
-  AlertCircle, 
   RotateCcw, 
   Info, 
-  ChevronDown,
   X,
-  Smile,
-  Zap,
-  PhoneCall,
-  ShieldAlert
+  Smile
 } from 'lucide-react';
-import { STORY_BEATS } from '../data/initialCharacters';
-import { playMessageSentSound, playMessageReceivedSound, playHeartGainSound } from '../utils/soundEffects';
+import { playMessageSentSound } from '../utils/soundEffects';
 
 const QUICK_REPLIES = [
   "Are you blushing right now?",
@@ -32,23 +22,14 @@ const QUICK_REPLIES = [
 
 export default function ChatWindow({
   character,
-  playerProfile,
   onSendMessage,
   isWaitingForAi,
-  errorMessage,
-  onClearError,
   onBack,
-  hasApiKey,
-  onOpenProfile,
   soundEnabled,
   onResetChatHistory
 }) {
   const [inputText, setInputText] = useState('');
-  const [activeStoryBeat, setActiveStoryBeat] = useState(null);
-  const [showStoryDropdown, setShowStoryDropdown] = useState(false);
   const [showInfoModal, setShowInfoModal] = useState(false);
-  const [customBeatText, setCustomBeatText] = useState('');
-  const [showCustomBeatInput, setShowCustomBeatInput] = useState(false);
 
   const messagesEndRef = useRef(null);
   const textareaRef = useRef(null);
@@ -69,7 +50,7 @@ export default function ChatWindow({
         </div>
         <h3 className="text-lg font-bold text-slate-200">No Chat Selected</h3>
         <p className="text-xs text-slate-400 max-w-sm mt-1">
-          Select a character from the left or create a custom BL love interest to begin your story.
+          Select a character from the left to view your conversation.
         </p>
       </div>
     );
@@ -93,8 +74,7 @@ export default function ChatWindow({
     setInputText('');
     playMessageSentSound(soundEnabled);
 
-    onSendMessage(text, activeStoryBeat?.prompt || null);
-    setActiveStoryBeat(null);
+    onSendMessage(text);
 
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
@@ -106,24 +86,6 @@ export default function ChatWindow({
       e.preventDefault();
       handleSend();
     }
-  };
-
-  const selectStoryBeat = (beat) => {
-    setActiveStoryBeat(beat);
-    setShowStoryDropdown(false);
-    setShowCustomBeatInput(false);
-  };
-
-  const applyCustomStoryBeat = () => {
-    if (!customBeatText.trim()) return;
-    setActiveStoryBeat({
-      id: 'custom',
-      title: `⚡ Custom: ${customBeatText.slice(0, 30)}...`,
-      prompt: `[FORCED STORY BEAT EVENT]: ${customBeatText.trim()}`
-    });
-    setCustomBeatText('');
-    setShowStoryDropdown(false);
-    setShowCustomBeatInput(false);
   };
 
   return (
@@ -191,108 +153,11 @@ export default function ChatWindow({
 
           {/* Right Header Actions */}
           <div className="flex items-center gap-2 shrink-0">
-            {/* Story Beat Injector Button */}
-            <div className="relative">
-              <button
-                type="button"
-                onClick={() => setShowStoryDropdown(!showStoryDropdown)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all cursor-pointer shadow-sm ${
-                  activeStoryBeat
-                    ? 'bg-amber-500/20 border-amber-500/60 text-amber-300 ring-2 ring-amber-500/30'
-                    : 'bg-slate-800/80 hover:bg-slate-700 border-slate-700 text-slate-200'
-                }`}
-                title="Force a dramatic romance story event"
-              >
-                <Flame className={`w-3.5 h-3.5 ${activeStoryBeat ? 'text-amber-400 animate-bounce' : 'text-rose-400'}`} />
-                <span className="hidden sm:inline">Story Beat</span>
-                <ChevronDown className="w-3 h-3 text-slate-400" />
-              </button>
-
-              {/* Story Beat Dropdown Menu */}
-              {showStoryDropdown && (
-                <div className="absolute right-0 mt-2 w-72 sm:w-80 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-2 z-50 text-xs animate-fade-in divide-y divide-slate-800/60">
-                  <div className="p-2 pb-2.5">
-                    <div className="flex items-center justify-between">
-                      <span className="font-bold text-slate-200 flex items-center gap-1.5">
-                        <Flame className="w-4 h-4 text-amber-400" />
-                        Inject Story Event
-                      </span>
-                      <button
-                        onClick={() => setShowStoryDropdown(false)}
-                        className="text-slate-400 hover:text-white p-1"
-                      >
-                        <X className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                    <p className="text-[11px] text-slate-400 mt-0.5 leading-snug">
-                      Force a sudden dramatic twist in your next message.
-                    </p>
-                  </div>
-
-                  <div className="py-1 max-h-60 overflow-y-auto space-y-1">
-                    {STORY_BEATS.map((beat) => (
-                      <button
-                        key={beat.id}
-                        type="button"
-                        onClick={() => selectStoryBeat(beat)}
-                        className="w-full text-left p-2 rounded-xl hover:bg-slate-800/80 text-slate-300 hover:text-white transition-colors block cursor-pointer"
-                      >
-                        <div className="font-semibold text-rose-300">
-                          {beat.title}
-                        </div>
-                        <div className="text-[10px] text-slate-400 line-clamp-2 mt-0.5">
-                          {beat.prompt.replace('[STORY BEAT EVENT]: ', '')}
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-
-                  <div className="pt-2 p-1.5">
-                    {!showCustomBeatInput ? (
-                      <button
-                        type="button"
-                        onClick={() => setShowCustomBeatInput(true)}
-                        className="w-full py-1.5 text-center text-[11px] text-rose-400 hover:text-rose-300 hover:bg-slate-800 rounded-lg transition-colors font-medium"
-                      >
-                        + Write Custom Scenario Event
-                      </button>
-                    ) : (
-                      <div className="space-y-1.5">
-                        <textarea
-                          rows={2}
-                          value={customBeatText}
-                          onChange={(e) => setCustomBeatText(e.target.value)}
-                          placeholder="e.g. He notices you wearing his oversized jacket..."
-                          className="w-full p-2 bg-slate-950 border border-slate-700 rounded-lg text-xs text-white resize-none"
-                        />
-                        <div className="flex items-center justify-end gap-1.5">
-                          <button
-                            type="button"
-                            onClick={() => setShowCustomBeatInput(false)}
-                            className="px-2 py-1 text-[10px] text-slate-400 hover:text-white"
-                          >
-                            Cancel
-                          </button>
-                          <button
-                            type="button"
-                            onClick={applyCustomStoryBeat}
-                            className="px-2.5 py-1 text-[10px] bg-rose-600 hover:bg-rose-500 text-white rounded-md font-semibold"
-                          >
-                            Inject
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
-
             {/* Character Lore Info Toggle */}
             <button
               type="button"
               onClick={() => setShowInfoModal(!showInfoModal)}
-              className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+              className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
               title="Character details and scenario"
             >
               <Info className="w-4 h-4" />
@@ -337,7 +202,7 @@ export default function ChatWindow({
             </h3>
             <button
               onClick={() => setShowInfoModal(false)}
-              className="p-1 text-slate-400 hover:text-white"
+              className="p-1 text-slate-400 hover:text-white cursor-pointer"
             >
               <X className="w-3.5 h-3.5" />
             </button>
@@ -376,35 +241,9 @@ export default function ChatWindow({
                   setShowInfoModal(false);
                 }
               }}
-              className="text-rose-400 hover:text-rose-300 flex items-center gap-1 text-[11px]"
+              className="text-rose-400 hover:text-rose-300 flex items-center gap-1 text-[11px] cursor-pointer"
             >
               <RotateCcw className="w-3 h-3" /> Reset Chat History
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* ERROR BANNER IF API FAILED */}
-      {errorMessage && (
-        <div className="px-4 py-2.5 bg-rose-950/90 border-b border-rose-800 flex items-center justify-between gap-3 text-xs text-rose-200 animate-fade-in z-20">
-          <div className="flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
-            <span>{errorMessage}</span>
-          </div>
-          <div className="flex items-center gap-2 shrink-0">
-            {!hasApiKey && (
-              <button
-                onClick={onOpenProfile}
-                className="px-2.5 py-1 bg-rose-600 hover:bg-rose-500 text-white rounded-lg font-semibold text-[11px]"
-              >
-                Open Settings
-              </button>
-            )}
-            <button
-              onClick={onClearError}
-              className="p-1 text-rose-300 hover:text-white"
-            >
-              <X className="w-3.5 h-3.5" />
             </button>
           </div>
         </div>
@@ -499,7 +338,7 @@ export default function ChatWindow({
           );
         })}
 
-        {/* ACTIVE TYPING ANIMATION (...) WHEN WAITING FOR AI RESPONSE */}
+        {/* ACTIVE TYPING ANIMATION (...) WHEN WAITING FOR RESPONSE */}
         {isWaitingForAi && (
           <div className="flex items-end gap-2.5 justify-start animate-fade-in">
             <div className="shrink-0 mb-1">
@@ -540,29 +379,6 @@ export default function ChatWindow({
         ))}
       </div>
 
-      {/* ACTIVE STORY BEAT INJECTOR BANNER */}
-      {activeStoryBeat && (
-        <div className="px-4 py-2 bg-amber-950/40 border-t border-amber-800/60 flex items-center justify-between gap-2 text-xs text-amber-200 animate-fade-in">
-          <div className="flex items-center gap-2 truncate">
-            <Flame className="w-4 h-4 text-amber-400 shrink-0" />
-            <span className="font-semibold text-amber-300">
-              Active Event Injected:
-            </span>
-            <span className="truncate text-amber-200/90">
-              {activeStoryBeat.title}
-            </span>
-          </div>
-          <button
-            type="button"
-            onClick={() => setActiveStoryBeat(null)}
-            className="p-1 text-amber-400 hover:text-white rounded"
-            title="Cancel injected event"
-          >
-            <X className="w-3.5 h-3.5" />
-          </button>
-        </div>
-      )}
-
       {/* INPUT FORM */}
       <div className="p-3 sm:p-4 bg-slate-900/95 border-t border-slate-800">
         <form onSubmit={handleSend} className="flex items-end gap-2 max-w-4xl mx-auto">
@@ -577,11 +393,7 @@ export default function ChatWindow({
                 e.target.style.height = `${Math.min(e.target.scrollHeight, 120)}px`;
               }}
               onKeyDown={handleKeyDown}
-              placeholder={
-                activeStoryBeat
-                  ? `Write how you react to this event... (Enter to send)`
-                  : `Type your message to ${character.name}... (Enter to send)`
-              }
+              placeholder={`Message ${character.name}... (Enter to send)`}
               className="w-full pl-4 pr-10 py-3 bg-slate-950 border border-slate-700/80 rounded-2xl text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-rose-500/50 resize-none max-h-32 leading-relaxed"
             />
           </div>

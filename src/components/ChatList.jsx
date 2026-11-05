@@ -1,14 +1,8 @@
 import React, { useState } from 'react';
 import { 
   Heart, 
-  UserPlus, 
-  AlertTriangle, 
-  Key, 
   Settings, 
   Search, 
-  Sparkles, 
-  ChevronRight,
-  Flame,
   MessageSquare
 } from 'lucide-react';
 
@@ -16,9 +10,7 @@ export default function ChatList({
   characters,
   selectedCharacterId,
   onSelectCharacter,
-  onOpenWizard,
   onOpenProfile,
-  hasApiKey,
   playerProfile
 }) {
   const [searchQuery, setSearchQuery] = useState('');
@@ -76,51 +68,14 @@ export default function ChatList({
 
           <div className="flex items-center gap-1.5">
             <button
-              onClick={onOpenWizard}
-              className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white transition-all cursor-pointer border border-slate-700/80 shadow-sm"
-              title="Create new BL character"
-            >
-              <UserPlus className="w-4 h-4 text-rose-400" />
-            </button>
-            <button
               onClick={onOpenProfile}
-              className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white transition-all cursor-pointer border border-slate-700/80 relative"
-              title="Profile & API Settings"
+              className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white transition-all cursor-pointer border border-slate-700/80"
+              title="Profile & Game Settings"
             >
               <Settings className="w-4 h-4" />
-              {!hasApiKey && (
-                <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-rose-500 animate-ping" />
-              )}
             </button>
           </div>
         </div>
-
-        {/* PROMINENT RED WARNING BANNER IF API KEY IS MISSING */}
-        {!hasApiKey && (
-          <div className="p-3 rounded-xl bg-rose-950/80 border border-rose-600/80 text-rose-100 flex items-start gap-2.5 shadow-lg shadow-rose-950/60 animate-fade-in">
-            <AlertTriangle className="w-5 h-5 text-rose-400 shrink-0 mt-0.5" />
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center justify-between">
-                <p className="text-xs font-bold text-white tracking-wide">
-                  Gemini API Key Required
-                </p>
-                <span className="text-[10px] font-bold text-rose-300 bg-rose-900/60 px-1.5 py-0.5 rounded border border-rose-700/50">
-                  ACTION NEEDED
-                </span>
-              </div>
-              <p className="text-[11px] text-rose-200/90 mt-0.5 leading-snug">
-                Characters cannot generate intelligent responses until your free Google AI Studio key is configured.
-              </p>
-              <button
-                type="button"
-                onClick={onOpenProfile}
-                className="mt-2 inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-rose-600 hover:bg-rose-500 text-white text-xs font-semibold tracking-wide transition-colors shadow cursor-pointer"
-              >
-                <Key className="w-3.5 h-3.5" /> Configure Key Now
-              </button>
-            </div>
-          </div>
-        )}
 
         {/* Search Bar */}
         <div className="relative">
@@ -141,12 +96,6 @@ export default function ChatList({
           <div className="p-8 text-center text-slate-500 space-y-3">
             <MessageSquare className="w-8 h-8 mx-auto text-slate-600 opacity-60" />
             <p className="text-xs">No characters found matching "{searchQuery}"</p>
-            <button
-              onClick={onOpenWizard}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-rose-600/20 text-rose-300 border border-rose-500/30 text-xs hover:bg-rose-600/30 transition-colors"
-            >
-              <UserPlus className="w-3.5 h-3.5" /> Create a Character
-            </button>
           </div>
         ) : (
           filteredCharacters.map((char) => {
@@ -275,14 +224,6 @@ export default function ChatList({
             </p>
           </div>
         </div>
-
-        <button
-          onClick={onOpenWizard}
-          className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-500 hover:to-pink-500 text-white text-xs font-medium transition-all shadow-md shadow-rose-950/40 cursor-pointer"
-        >
-          <UserPlus className="w-3.5 h-3.5" />
-          <span>New Char</span>
-        </button>
       </div>
     </div>
   );

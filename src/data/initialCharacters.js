@@ -1,6 +1,6 @@
 /**
  * Initial cast of BL characters with rich lore, dynamic backstories,
- * distinct aesthetics, and initial scenarios.
+ * distinct aesthetics, and initial scenarios for offline play.
  */
 
 export const INITIAL_CHARACTERS = [
@@ -131,62 +131,5 @@ export const INITIAL_CHARACTERS = [
         pointsAwarded: 0
       }
     ]
-  }
-];
-
-export const ARCHETYPES = [
-  { id: 'ceo', label: 'Overprotective CEO', desc: 'Cold in business, intensely possessive and protective in private' },
-  { id: 'tsundere', label: 'Grumpy Senior / Tsundere', desc: 'Sharp-tongued and critical, secretly dotes on you' },
-  { id: 'sunshine', label: 'Soft Sunshine / Golden Retriever', desc: 'Warm, expressive, easily flustered and lovingly devoted' },
-  { id: 'badboy', label: 'Mysterious Bad Boy / Rebel', desc: 'Dark humor, quiet intensity, secretly deep and protective' },
-  { id: 'childhood', label: 'Childhood Friend with Longing', desc: 'Knows all your habits, hiding years of unspoken yearning' },
-  { id: 'elite', label: 'Doctor / Professor', desc: 'Composed, brilliant, commanding presence with a gentle touch' },
-  { id: 'idol', label: 'Famous Idol / Celebrity', desc: 'Charismatic superstar who only drops his mask around you' }
-];
-
-export const RELATIONSHIP_DYNAMICS = [
-  { id: 'fake_dating', label: 'Fake Dating to Real Love', desc: 'Started as a staged act for family/society, sparks become undeniable' },
-  { id: 'enemies', label: 'Enemies / Rivals to Lovers', desc: 'Bickering tension and competitive heat turning into intense passion' },
-  { id: 'roommates', label: 'Forced Proximity / Roommates', desc: 'Accidental touches, morning bedhead, late-night kitchen whispers' },
-  { id: 'strangers', label: 'Strangers to Fated Lovers', desc: 'A fateful midnight encounter that neither could walk away from' },
-  { id: 'office', label: 'Secret Workplace Romance', desc: 'Forbidden glances across meeting rooms, stolen touches in empty hallways' },
-  { id: 'bodyguard', label: 'Bodyguard & VIP Client', desc: 'Duty vs affection, vows of physical protection blurring into intimacy' }
-];
-
-export const STORY_BEATS = [
-  {
-    id: 'rainstorm',
-    title: '🌧️ Sudden Rainstorm / One Umbrella',
-    prompt: '[STORY BEAT EVENT]: A torrential downpour suddenly traps the two of you outside under an awning. One of you only has a small single umbrella, forcing you shoulder-to-shoulder, drenched and breathing in sync.'
-  },
-  {
-    id: 'handcuffs',
-    title: '🔒 Waking Up Handcuffed Together',
-    prompt: '[STORY BEAT EVENT]: You wake up in a strange room on the same bed, wrists connected by a pair of heavy metal handcuffs. Neither can remember how it happened, but moving requires complete physical coordination.'
-  },
-  {
-    id: 'drunk_call',
-    title: '🍷 2:00 AM Accidental Drunk Call',
-    prompt: '[STORY BEAT EVENT]: It is 2:15 AM. You receive an unexpected call or flurry of unguarded text messages from him after a company/social gathering. His voice/texts are slightly slurred, vulnerable, and dangerously honest.'
-  },
-  {
-    id: 'stare_caught',
-    title: '👀 Caught Staring Longingly',
-    prompt: '[STORY BEAT EVENT]: You look up suddenly and catch him staring intently at your lips and eyes. Instead of immediately looking away, he pauses, throat moving as he swallows, caught completely off-guard.'
-  },
-  {
-    id: 'fever_care',
-    title: '🩹 Tending to an Injury / Fever Care',
-    prompt: '[STORY BEAT EVENT]: One of you has a sudden fever or a bleeding scrape on the hand. The other sits close on the sofa with a warm cloth and antiseptic, gently holding fingers and whispering soft reprimands.'
-  },
-  {
-    id: 'jealous_rival',
-    title: '⚡ Jealousy & Possessive Reaction',
-    prompt: '[STORY BEAT EVENT]: An attractive third party approaches you and asks for your number or flirts overtly. He steps in immediately, eyes dark with jealousy, placing an arm firmly around your waist.'
-  },
-  {
-    id: 'whisper_dark',
-    title: '🌙 Midnight Confession in the Dark',
-    prompt: '[STORY BEAT EVENT]: The lights go out in the room. In the heavy silence of the dark, he breaks the quiet with a confession he could never speak under daylight.'
   }
 ];

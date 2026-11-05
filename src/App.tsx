@@ -3,9 +3,7 @@ import { useLocalStorage } from './hooks/useLocalStorage';
 import { INITIAL_CHARACTERS } from './data/initialCharacters';
 import ChatList from './components/ChatList';
 import ChatWindow from './components/ChatWindow';
-import CharacterWizard from './components/CharacterWizard';
 import UserProfile from './components/UserProfile';
-import { sendChatMessage, API_KEY_STORAGE_KEY } from './services/gemini';
 import { playHeartGainSound, playMessageReceivedSound } from './utils/soundEffects';
 import { Character, Message, PlayerProfile } from './types';
 
@@ -16,20 +14,17 @@ export default function App() {
     'heartblink_selected_id',
     INITIAL_CHARACTERS[0]?.id || null
   );
-  const [apiKey, setApiKey] = useLocalStorage(API_KEY_STORAGE_KEY, '');
   const [playerProfile, setPlayerProfile] = useLocalStorage('heartblink_player_profile', {
     name: 'Haru',
     pronouns: 'He/Him',
-    details: 'Quick-witted assistant who works overtime, secretly easily flustered by sincere compliments.',
+    details: 'Quick-witted design student with a sharp eye, easily flustered by sincere compliments.',
     avatar: 'av-1'
   });
   const [soundEnabled, setSoundEnabled] = useLocalStorage('heartblink_sound_enabled', true);
 
-  // UI state
+  // UI view state
   const [currentView, setCurrentView] = useState<'chats' | 'profile'>('chats');
-  const [isWizardOpen, setIsWizardOpen] = useState<boolean>(false);
   const [isWaitingForAi, setIsWaitingForAi] = useState<boolean>(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   // Selected character object
   const selectedCharacter: Character | null =
@@ -37,18 +32,9 @@ export default function App() {
     (characters as Character[])[0] ||
     null;
 
-  // Handle creating a new custom BL character
-  const handleCreateCharacter = (newChar: Character) => {
-    setCharacters((prev: Character[]) => [newChar, ...prev]);
-    setSelectedCharacterId(newChar.id);
-    setCurrentView('chats');
-  };
-
-  // Handle sending a chat message to the character via Gemini
-  const handleSendMessage = async (userText: string, storyBeatPrompt: string | null = null) => {
+  // Handle player sending a message in offline mode
+  const handleSendMessage = (userText: string) => {
     if (!selectedCharacter || isWaitingForAi) return;
-
-    setErrorMessage(null);
 
     const now = new Date();
     const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -57,11 +43,10 @@ export default function App() {
       id: `msg-u-${Date.now()}`,
       sender: 'user',
       text: userText,
-      timestamp: timeString,
-      storyBeat: storyBeatPrompt ? true : false
+      timestamp: timeString
     };
 
-    // Optimistically update character messages with user's new message
+    // Append user message immediately
     const updatedMessages = [...(selectedCharacter.messages || []), userMessage];
 
     setCharacters((prev: Character[]) =>
@@ -72,30 +57,42 @@ export default function App() {
       )
     );
 
+    // Simulate character reading and responding locally
     setIsWaitingForAi(true);
 
-    try {
-      const response = await sendChatMessage({
-        character: selectedCharacter,
-        playerProfile,
-        messageHistory: updatedMessages,
-        newUserMessage: userText,
-        storyBeatPrompt
-      });
+    setTimeout(() => {
+      // In-character offline response generator for current cast
+      let replyText = "...I saw your message.";
+      let pointsDelta = 2;
+      let reaction = 'smiles';
 
-      const { cleanMessage, pointsDelta, reaction, reason } = response;
+      if (selectedCharacter.id === 'char-killian') {
+        replyText = "Don't think I haven't noticed how frequently you text me. Make sure you're ready tonight.";
+        pointsDelta = 3;
+        reaction = 'smirking';
+      } else if (selectedCharacter.id === 'char-ren') {
+        replyText = "Still awake? Don't make excuses tomorrow if you're yawning during design review.";
+        pointsDelta = 2;
+        reaction = 'flustered';
+      } else if (selectedCharacter.id === 'char-yohan') {
+        replyText = "Hehe, I just finished practice and saw this! You always know how to make me smile! ✨";
+        pointsDelta = 4;
+        reaction = 'blushing';
+      } else if (selectedCharacter.id === 'char-damian') {
+        replyText = "You're getting bolder with your words. I don't hate it.";
+        pointsDelta = 3;
+        reaction = 'intrigued';
+      }
 
       const aiMessage: Message = {
         id: `msg-ai-${Date.now()}`,
         sender: 'char',
-        text: cleanMessage,
+        text: replyText,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         pointsAwarded: pointsDelta,
-        reaction,
-        reason
+        reaction
       };
 
-      // Calculate new clamped points (0 to 100)
       const currentPts = selectedCharacter.points || 0;
       const newPoints = Math.max(0, Math.min(100, currentPts + pointsDelta));
 
@@ -113,20 +110,16 @@ export default function App() {
         )
       );
 
-      // Play audio cues
+      setIsWaitingForAi(false);
+
+      // Play local sound effects
       playMessageReceivedSound(soundEnabled);
       if (pointsDelta > 0) {
         setTimeout(() => {
           playHeartGainSound(soundEnabled);
-        }, 150);
+        }, 120);
       }
-    } catch (err: unknown) {
-      console.error('Chat error:', err);
-      const message = err instanceof Error ? err.message : 'Failed to receive a response from character.';
-      setErrorMessage(message);
-    } finally {
-      setIsWaitingForAi(false);
-    }
+    }, 900);
   };
 
   // Reset chat history for a specific character
@@ -160,19 +153,16 @@ export default function App() {
   const handleResetAllData = () => {
     setCharacters(INITIAL_CHARACTERS as unknown as Character[]);
     setSelectedCharacterId(INITIAL_CHARACTERS[0].id);
-    setErrorMessage(null);
   };
 
   return (
     <div className="flex h-screen w-screen bg-slate-950 text-slate-100 font-sans overflow-hidden select-none">
-      {/* View Switcher: Settings / User Profile Modal View */}
+      {/* View Switcher: User Profile Settings View */}
       {currentView === 'profile' ? (
         <UserProfile
           profile={playerProfile}
           onSaveProfile={(updated: PlayerProfile) => setPlayerProfile(updated)}
           onClose={() => setCurrentView('chats')}
-          apiKey={apiKey}
-          onSaveApiKey={(key: string) => setApiKey(key)}
           soundEnabled={soundEnabled}
           onToggleSound={() => setSoundEnabled(!soundEnabled)}
           onResetAllData={handleResetAllData}
@@ -190,9 +180,7 @@ export default function App() {
               characters={characters}
               selectedCharacterId={selectedCharacterId}
               onSelectCharacter={(id: string) => setSelectedCharacterId(id)}
-              onOpenWizard={() => setIsWizardOpen(true)}
               onOpenProfile={() => setCurrentView('profile')}
-              hasApiKey={Boolean(apiKey && apiKey.trim().length > 0)}
               playerProfile={playerProfile}
             />
           </div>
@@ -205,27 +193,15 @@ export default function App() {
           >
             <ChatWindow
               character={selectedCharacter}
-              playerProfile={playerProfile}
               onSendMessage={handleSendMessage}
               isWaitingForAi={isWaitingForAi}
-              errorMessage={errorMessage}
-              onClearError={() => setErrorMessage(null)}
               onBack={() => setSelectedCharacterId(null)}
-              hasApiKey={Boolean(apiKey && apiKey.trim().length > 0)}
-              onOpenProfile={() => setCurrentView('profile')}
               soundEnabled={soundEnabled}
               onResetChatHistory={handleResetChatHistory}
             />
           </div>
         </div>
       )}
-
-      {/* Character Wizard Modal */}
-      <CharacterWizard
-        isOpen={isWizardOpen}
-        onClose={() => setIsWizardOpen(false)}
-        onCreateCharacter={handleCreateCharacter}
-      />
     </div>
   );
 }

@@ -1,6 +1,6 @@
 {
   "name": "HeartBLink: BL Dating Simulation Game",
-  "description": "HeartBLink is an immersive dark-mode BL chat dating simulation game with customizable characters, dynamic relationship scoring, and dramatic story beats.",
+  "description": "HeartBLink is an immersive offline dark-mode BL chat dating simulation game with story routes, dynamic relationship progression, and messenger interactions.",
   "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+  "majorCapabilities": []
 }
